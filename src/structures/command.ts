@@ -7,6 +7,7 @@ interface CustomOptions {
     cooldown?: number;
     visible?: boolean;
     guildOnly?: boolean;
+    channels?: string[];
 };
 
 interface CommandOptions {
