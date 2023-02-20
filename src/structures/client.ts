@@ -77,6 +77,7 @@ export class ExtendedClient extends Client {
     async start() {
       this.login(process.env.TOKEN);
       this.loadModules();
+      mongoose.set("strictQuery", false);
       await mongoose.connect(process.env.MONGOOSE);
     };
 };
