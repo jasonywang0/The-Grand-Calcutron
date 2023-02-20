@@ -1,4 +1,5 @@
 import { Client, ClientEvents, Collection, GatewayIntentBits } from 'discord.js';
+import mongoose from 'mongoose';
 
 import { EventClass } from './event.js';
 import { CommandClass } from './command.js';
@@ -74,7 +75,8 @@ export class ExtendedClient extends Client {
      * This is used to log into the Discord API with loading all commands and events.
      */
     async start() {
-        this.login(process.env.TOKEN);
-        this.loadModules();
+      await this.login(process.env.TOKEN);
+      await this.loadModules();
+      await mongoose.connect(process.env.MONGOOSE);
     };
 };
