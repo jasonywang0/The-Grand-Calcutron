@@ -99,7 +99,7 @@ UserSchema.statics.findUserAndUpdate = function(discordId, payload)  {
    return this.findOneAndUpdate({ discordId }, payload, { upsert: true, returnOriginal: false, runValidators: true, strict: true })
 };
 
-UserSchema.statics.findUserAndLevel = async function (discordId, amount = 1) {
+UserSchema.statics.findUserAndLevel = async function (discordId, amount) {
   const payload = { $inc: { points: amount } };
   const user = await User.findUserAndUpdate(discordId, payload);
   return user;
