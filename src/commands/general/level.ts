@@ -5,7 +5,7 @@ import User from '../../db/models/user.model.js';
 export default new CommandClass({
     data: new SlashCommandBuilder()
         .setName('level')
-        .setDescription('Check level')
+        .setDescription('Level Info')
         .addStringOption(option => 
           option
             .setName('option')
