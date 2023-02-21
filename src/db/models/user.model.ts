@@ -9,9 +9,10 @@ interface IUser {
 }
 
 interface IUserDocument extends IUser, Document {
-  getPoints: () => Promise<number>
-  setPoints: (points: number) => Promise<void>
-  getCubes: () => Promise<Cube[]>
+  getPoints: () => number
+  setPoints: (points: number) => void
+  getCubes: () => Cube[]
+  setCubes: (cubes: Cube[]) => void 
 }
 
 interface IUserModel extends Model<IUserDocument> {
@@ -77,32 +78,30 @@ const UserSchema:Schema<IUserDocument> = new Schema({
   }
 },  {strictQuery: false});
 
-UserSchema.methods.getPoints = async function() {
+UserSchema.methods.getPoints = function() {
   return this.points;
 };
 
-UserSchema.methods.setPoints = async function (points: number) {
+UserSchema.methods.setPoints = function (points: number) {
   if (points < 0) throw new Error('Points can not be below 0');
   this.points = points;
-  this.save();
 };
 
-UserSchema.methods.getCubes = async function() {
+UserSchema.methods.getCubes = function() {
   return this.cubes;
 };
 
-UserSchema.statics.findUser = function(discordId) {
+UserSchema.methods.setCubes = function(cubes: Cube[]) {
+  this.cubes = cubes;
+};
+
+
+UserSchema.statics.findUser = async function(discordId) {
   return this.findOne({ discordId });
 };
 
-UserSchema.statics.findUserAndUpdate = function(discordId, payload)  {
-   return this.findOneAndUpdate({ discordId }, payload, { upsert: true, returnOriginal: false, runValidators: true, strict: true })
-};
-
-UserSchema.statics.findUserAndLevel = async function (discordId, amount) {
-  const payload = { $inc: { points: amount } };
-  const user = await User.findUserAndUpdate(discordId, payload);
-  return user;
+UserSchema.statics.findUserAndUpdate = async function(discordId, payload)  {
+   return await this.findOneAndUpdate(  { discordId }, payload, { upsert: true, returnOriginal: false, runValidators: true, strict: true } )
 };
 
 const User = mongoose.model<IUserDocument, IUserModel>('User', UserSchema);
