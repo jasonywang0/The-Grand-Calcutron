@@ -4,7 +4,7 @@ import { CommandClass } from '../../structures/command.js';
 export default new CommandClass({
     data: new SlashCommandBuilder()
         .setName('fired')
-        .setDescription('Let members know the draft has fired') as SlashCommandBuilder,
+        .setDescription('Announce the draft has fired') as SlashCommandBuilder,
     opt: {
         userPermissions: ['SendMessages'],
         botPermissions: ['SendMessages'],
