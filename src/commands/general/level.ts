@@ -6,16 +6,21 @@ export default new CommandClass({
     data: new SlashCommandBuilder()
         .setName('level')
         .setDescription('Level Info')
-        .addStringOption(option => 
-          option
-            .setName('option')
-            .setDescription('Level Up!')
-            .setRequired(true)
-            .addChoices(
-              { name: 'Get', value: 'get' },
-              { name: 'Up', value: 'up' },
-              { name: 'Down', value: 'down' },
-				)) as SlashCommandBuilder,
+        .addSubcommand(subcommand => 
+          subcommand
+            .setName('get')
+            .setDescription('Get level')
+        ) 
+        .addSubcommand(subcommand => 
+          subcommand
+            .setName('up')
+            .setDescription('Level up')
+        )
+        .addSubcommand(subcommand => 
+          subcommand
+            .setName('down')
+            .setDescription('Level down')
+         ) as SlashCommandBuilder,
     opt: {
         userPermissions: ['SendMessages'],
         botPermissions: ['SendMessages'],
@@ -29,16 +34,16 @@ export default new CommandClass({
       let ephemeral = true;
       let content = '';
       try {
-        const option = interaction.options.getString('option', true);
+        const subcommand = interaction.options.getSubcommand();
         let user = await User.findUser(interaction.user.id);
         if (!user) user = new User({discordId: interaction.user.id});
         let points = user?.getPoints() || 0;
-        if (option === 'up') {
+        if (subcommand === 'up') {
           ephemeral = false;
           points += 1;
           user.setPoints(points);
           await user.save();
-        } else if (option === 'down') {
+        } else if (subcommand === 'down') {
           points -= 1;
           user.setPoints(points);
           await user.save();
