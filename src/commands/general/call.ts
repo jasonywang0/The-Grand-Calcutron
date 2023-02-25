@@ -19,7 +19,7 @@ export default new CommandClass({
         userPermissions: ['SendMessages'],
         botPermissions: ['SendMessages'],
         category: 'General',
-        cooldown: 5,
+        cooldown: 600,
         visible: true,
         guildOnly: false,
         channels: [process.env.DRAFT_CHANNEL]
