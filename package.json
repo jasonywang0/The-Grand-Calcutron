@@ -11,7 +11,7 @@
     "prebuild": "npm run clean",
     "build": "tsc",
     "watch": "tsc -w",
-    "start": "npm run build && node dist/deploy-commands.js && npm run start:prod",
+    "start": "npm run build && npm run start:prod",
     "deploy": "node dist/deploy-commands.js"
   },
   "repository": {
