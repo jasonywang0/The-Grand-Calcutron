@@ -78,8 +78,20 @@ UserSchema.methods.setCubes = function(cubes: ICube[]) {
 };
 
 UserSchema.methods.addCube = function(link: string) {
-  const cube = new Cube({link});
-  this.cubes.push(cube);
+  try {
+    // TODO: clean up
+    const url = new URL(link); // can throw an error if the link is not complete
+    if (url.hostname !== 'cubecobra.com' && url.hostname !== 'cubeartisan.net') {
+      throw new Error(`URL must be a complete link from cube cobra or artisan. Here's an example: https://cubecobra.com/cube/list/thunderwang`);
+    }
+    const cubes = this.getCubes();
+    if (cubes.length > 5) throw new Error('Cube limit reached!');  
+    const cube = new Cube({link});
+    cubes.push(cube);
+  } catch (e) {
+    if (e.code === 'ERR_INVALID_URL') e.message = `URL must be a complete link from cube cobra or artisan. Here's an example: https://cubecobra.com/cube/list/thunderwang`;
+    throw e;
+  }
 }
 
 UserSchema.methods.findCube = function(link: string) {

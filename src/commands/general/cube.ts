@@ -64,11 +64,7 @@ export default new CommandClass({
           if (!user) user = new User({discordId: interaction.user.id});
           let option = interaction.options.getString('url');
           if (subcommand === 'add') {
-            const cubes = user.getCubes();
-            if (cubes.length > 5) throw new Error('the limt has been set');
             user.addCube(option);
-            const url = new URL(option);
-            if (url.hostname !== 'cubecobra.com') throw new Error(`URL must be a complete link from cube cobra. Here's an example: https://cubecobra.com/cube/list/thunderwang`);
             await user.save();
             content = `${option} has been added!`;
           } else if (subcommand === 'delete') {
