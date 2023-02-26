@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandClass } from '../../structures/command.js';
 import User from '../../db/models/user.model.js';
+import getCubeMeta from '../../misc/helpers/dom-parser.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()
@@ -57,8 +58,11 @@ export default new CommandClass({
           let user = await User.findUser(dsUser.id);
           const cubes = user?.getCubes() || [];
           if (!cubes.length) throw new Error('The user has no cubes set.');
-          // TODO: Make this look nice
-          content = cubes.toString();            
+          const metas = await Promise.all(cubes.map((cube) => getCubeMeta(cube.link)));
+          content = '';
+          metas.forEach((meta, index) => {
+            content += `**${index + 1}. ${meta?.title || 'Title Not Found'}** \n ${meta?.url || ' URL Not Found'} \n`;
+          })
         } else {
           let user = await User.findUser(interaction.user.id);
           if (!user) user = new User({discordId: interaction.user.id});
