@@ -69,10 +69,14 @@ export default new EventClass({
                 const expirationTime = timestamps.get(interaction.user.id) + cooldownAmount;
 
                 if (now < expirationTime) {
-                    const timeLeft = (expirationTime - now) / 1000;
-
+                    let timeLeft = (expirationTime - now) / 1000;
+                    let unit = 'second(s)';
+                    if (timeLeft >= 60) {
+                      unit = 'minutes(s)';
+                      timeLeft = Math.ceil(timeLeft/60);
+                    }
                     interaction.reply({
-                        content: `Please wait ${bold(`${timeLeft.toFixed()} second(s)`)} before reusing this command!`,
+                        content: `Please wait ${bold(`${timeLeft.toFixed()} ${unit}`)} before reusing this command!`,
                         ephemeral: true
                     });
                     return;
