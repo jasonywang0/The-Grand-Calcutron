@@ -1,18 +1,22 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
+import {ICube, Cube, CubeSchema} from './cube.model.js';
 
 interface IUser {
   discordId: string,
   discordTag: string,
   points: number,
   maritLage?: boolean,
-  cubes?: Cube[]
+  cubes?: ICube[]
 }
 
 interface IUserDocument extends IUser, Document {
   getPoints: () => number
   setPoints: (points: number) => void
-  getCubes: () => Cube[]
-  setCubes: (cubes: Cube[]) => void 
+  getCubes: () => ICube[]
+  setCubes: (cubes: ICube[]) => void 
+  addCube: (link: string) => void
+  findCube: (link: string) => ICube | null
+  deleteCube: (link: string) => void 
 }
 
 interface IUserModel extends Model<IUserDocument> {
@@ -21,45 +25,21 @@ interface IUserModel extends Model<IUserDocument> {
   findUserAndLevel: (discordId: string, amount: number) => Promise<IUserDocument>;
 }
 
-interface Cube {
-  name: string,
-  link: string
-}
-
-const CubeSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  link: {
-    type: String,
-    required: true,
-    lowercase: true,
-    trim: true,
-    max: 2000,
-    validate: {
-      async validator(value: string) {
-        return new URL(value).hostname === 'cubecobra.com';
-      },
-      message: 'Cube URL must be from CubeCobra!',
-    },
-  },
-});
-
 const UserSchema:Schema<IUserDocument> = new Schema({
   discordId: {
     type: String,
-    required: true,
     unique: true,
+    required: true,
   },
   discordTag: {
     type: String,
-    minlength: 1,
-    maxlength: 255,
     trim: true,
+    minlength: 1,
+    maxlength: 500,
   },
   points: {
     type: Number,
+    required: true,
     default: 0,
     min: 0,
     validate: {
@@ -71,9 +51,11 @@ const UserSchema:Schema<IUserDocument> = new Schema({
   },
   maritLage: {
     type: Boolean,
+    required: true,
     default: false,
   },
   cubes: {
+    required: true,
     type: [CubeSchema]
   }
 },  {strictQuery: false});
@@ -91,10 +73,24 @@ UserSchema.methods.getCubes = function() {
   return this.cubes;
 };
 
-UserSchema.methods.setCubes = function(cubes: Cube[]) {
+UserSchema.methods.setCubes = function(cubes: ICube[]) {
   this.cubes = cubes;
 };
 
+UserSchema.methods.addCube = function(link: string) {
+  const cube = new Cube({link});
+  this.cubes.push(cube);
+}
+
+UserSchema.methods.findCube = function(link: string) {
+  const cube = this.cubes.find((cube:ICube) => cube.link.toLowerCase() === link.toLowerCase());
+  return cube || null; 
+}
+
+UserSchema.methods.deleteCube = function(link: string) {
+  const index = this.cubes.findIndex((cube:ICube) => cube.link.toLowerCase() === link.toLowerCase());
+  if (index >= 0) this.cubes.splice(index, 1);
+}
 
 UserSchema.statics.findUser = async function(discordId) {
   return this.findOne({ discordId });
@@ -105,4 +101,5 @@ UserSchema.statics.findUserAndUpdate = async function(discordId, payload)  {
 };
 
 const User = mongoose.model<IUserDocument, IUserModel>('User', UserSchema);
+
 export default User;
