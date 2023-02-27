@@ -10,22 +10,30 @@ export default new CommandClass({
         subcommand
           .setName('add')
           .setDescription('Add a role')
-          .addRoleOption(option =>
+          .addStringOption(option =>
             option
               .setName('role')
               .setDescription('Role to add')
               .setRequired(true)
-            )
+              .addChoices(
+                { name: 'Xmage', value: 'xmage' },
+                { name: 'Cockatrice', value: 'cockatrice' },
+              )
+          )
       )
       .addSubcommand(subcommand => 
         subcommand
           .setName('remove')
           .setDescription('Remove a role')
-          .addRoleOption(option =>
+          .addStringOption(option =>
             option
               .setName('role')
               .setDescription('Role to remove')
               .setRequired(true)
+              .addChoices(
+                { name: 'Xmage', value: 'xmage' },
+                { name: 'Cockatrice', value: 'cockatrice' },
+              )
             )
       ) as SlashCommandBuilder,
     opt: {
@@ -40,16 +48,17 @@ export default new CommandClass({
       let content = 'Something went wrong!';
       try {
         const subcommand = interaction.options.getSubcommand();
-        const role = interaction.options.getRole('role');
+        const role = interaction.options.getString('role');
         if (!role) throw new Error('Role does not exist!');
+        const roleId = role === 'xmage' ? process.env.XMAGE_ROLE : process.env.TRICE_ROLE;
         if (subcommand === 'add') {
-          if (role.id == process.env.XMAGE_ROLE) await interaction.member.roles.add(process.env.XMAGE_ROLE);
-          if (role.id == process.env.TRICE_ROLE) await interaction.member.roles.add(process.env.TRICE_ROLE);
-          content = `<@&${role.id}> has been added!`;
-        } else if (subcommand === 'delete') {
-          if (role.id == process.env.XMAGE_ROLE) await interaction.member.roles.remove(process.env.XMAGE_ROLE);
-          if (role.id == process.env.TRICE_ROLE) await interaction.member.roles.remove(process.env.TRICE_ROLE);
-          content = `<@&${role.id}> has been removed!`;
+          if (role === 'xmage') await interaction.member.roles.add(roleId);
+          if (role === 'cockatrice') await interaction.member.roles.add(roleId);
+          content = `<@&${roleId}> has been added!`;
+        } else if (subcommand === 'remove') {
+          if (role === 'xmage') await interaction.member.roles.remove(roleId);
+          if (role === 'cockatrice') await interaction.member.roles.remove(roleId);
+          content = `<@&${roleId}> has been removed!`;
         }
       } catch (error) {
         content = error.message;
