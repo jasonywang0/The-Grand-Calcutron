@@ -6,7 +6,7 @@ interface IImage {
   meta?: string,
 }
 
-interface IImageDocument extends IImage, Document {
+export interface IImageDocument extends IImage, Document {
   getName: () => string
   setName: (name: string) => void 
   getLink: () => string,
