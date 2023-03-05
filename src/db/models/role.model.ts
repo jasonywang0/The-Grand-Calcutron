@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Model, Types } from 'mongoose';
-import Image, { IImageDocument} from './image.model.js';
+import {Image,  IImageDocument} from './image.model.js';
 
 interface IRole {
   discordId: string,
@@ -15,9 +15,8 @@ interface IRoleDocument extends IRole, Document {
   setName: (name: string) => void 
   getPoints: () => number
   setPoints: (points: number) => void
-  getImage: () => Types.ObjectId,
   setImage: (image: Types.ObjectId) => void
-  getImageDoc: () => Promise<IImageDocument | null>
+  getImage: () => Promise<IImageDocument | null>
 }
 
 interface IRoleModel extends Model<IRoleDocument> {
@@ -95,4 +94,4 @@ RoleSchema.statics.findRolesByPoints = async function(points: number) {
 
 const Role = mongoose.model<IRoleDocument, IRoleModel>('Role', RoleSchema);
 
-export default Role;
+export { Role, IRole, IRoleDocument }

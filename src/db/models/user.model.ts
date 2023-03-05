@@ -114,4 +114,4 @@ UserSchema.statics.findUserAndUpdate = async function(discordId, payload)  {
 
 const User = mongoose.model<IUserDocument, IUserModel>('User', UserSchema);
 
-export default User;
+export { User, IUser, IUserDocument };

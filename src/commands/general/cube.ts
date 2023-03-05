@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandClass } from '../../structures/command.js';
-import User from '../../db/models/user.model.js';
+import { User } from '../../db/models/user.model.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()

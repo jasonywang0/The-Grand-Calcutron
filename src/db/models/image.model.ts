@@ -6,7 +6,7 @@ interface IImage {
   meta?: string,
 }
 
-export interface IImageDocument extends IImage, Document {
+interface IImageDocument extends IImage, Document {
   getName: () => string
   setName: (name: string) => void 
   getLink: () => string,
@@ -67,4 +67,4 @@ ImageSchema.statics.findByName = async function(name: string) {
 
 const Image = mongoose.model<IImageDocument, IImageModel>('Image', ImageSchema);
 
-export default Image;
+export { Image, IImage, IImageDocument }
