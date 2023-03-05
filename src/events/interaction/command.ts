@@ -76,7 +76,7 @@ export default new EventClass({
                       timeLeft = Math.ceil(timeLeft/60);
                     }
                     interaction.reply({
-                        content: `Please wait ${bold(`${timeLeft.toFixed()} ${unit}`)} before reusing this command!`,
+                        content: `Please wait ${bold(`${Math.ceil(timeLeft)} ${unit}`)} before reusing this command!`,
                         ephemeral: true
                     });
                     return;
