@@ -17,7 +17,7 @@ export async function createLevelGetEmbed(info:levelInfo): Promise<EmbedBuilder>
     .setColor(role.color)
     .setTitle(`Level Stats`)
     .setThumbnail(interaction.user.displayAvatarURL())
-    .setDescription(`**<@!${interaction.user.id}> has ${points} counters!**`)
+    .setDescription(`**<@!${interaction.user.id}> is a <@&${role.id}> with ${points} points!**`)
     .setImage(image.getLink() || interaction.user.displayAvatarURL());
 }
 
@@ -25,7 +25,7 @@ export async function createLevelUpEmbed(info:levelInfo): Promise<EmbedBuilder> 
   const { interaction, level, points } = info;
   let color = 0x40863f;
   let title = 'Level Up';
-  let description = `**<@!${interaction.user.id}> leveled up to ${points} counters!**`;
+  let description = `**<@!${interaction.user.id}> leveled up to ${points} points!**`;
   const image = await Image.findByName('level');
   let imageLink = image.getLink();
 
@@ -36,7 +36,7 @@ export async function createLevelUpEmbed(info:levelInfo): Promise<EmbedBuilder> 
     color = role.color;
     imageLink = image.getLink();
     title = `:fire: **Polymorph** :fire:`;
-    description = `**<@!${interaction.user.id}> leveled up to <@&${role.id}> with ${points} counters!**`;
+    description = `**<@!${interaction.user.id}> leveled up to <@&${role.id}> with ${points} points!**`;
   } 
   return new EmbedBuilder()
     .setColor(color)
