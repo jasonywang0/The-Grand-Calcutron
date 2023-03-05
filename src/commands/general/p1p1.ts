@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandClass } from '../../structures/command.js';
-import getPack from '../../misc/helpers/get-pack.js';
+import getPack from '../../misc/getPack.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()
@@ -20,7 +20,7 @@ export default new CommandClass({
       .addSubcommand(subcommand => 
         subcommand
           .setName('artisan')
-          .setDescription('Use Cube Artisa~n')
+          .setDescription('Use Cube Artisan')
           .addStringOption(option =>
             option
               .setName('tag')
