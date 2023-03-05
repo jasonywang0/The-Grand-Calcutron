@@ -71,15 +71,11 @@ RoleSchema.methods.setPoints = function (points: number) {
   this.points = points;
 };
 
-RoleSchema.methods.getImage = function () {
-  return this.image;
-};
-
 RoleSchema.methods.setImage = function(image: Types.ObjectId) {
   this.image = image;
 };
 
-RoleSchema.methods.getImageDoc = async function() {
+RoleSchema.methods.getImage = async function() {
   return Image.findById(this.image);
 }
 
@@ -91,7 +87,7 @@ RoleSchema.statics.findRolesByPoints = async function(points: number) {
   const all = await Role.find({});
   let levels = all.filter((role) => typeof(role.points) === 'number');
   levels = levels.sort((a, b) => a.points - b.points);
-  const goodLevels = []; // earned levels
+  const goodLevels = []; // levels that should be added if necessary
   const badLevels = []; // levels that should be removed
   levels.forEach((level) => points >= level.points ? goodLevels.push(level) : badLevels.push(level));
   return [goodLevels, badLevels]
