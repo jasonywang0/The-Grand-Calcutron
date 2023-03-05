@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandClass } from '../../structures/command.js';
 import User from '../../db/models/user.model.js';
+import Role from '../../db/models/role.model.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()
@@ -32,7 +33,7 @@ export default new CommandClass({
     },
     async execute(interaction: ChatInputCommandInteraction<'cached'>) {
       let ephemeral = true;
-      let content = '';
+      let content = 'Something went wrong!';
       try {
         const subcommand = interaction.options.getSubcommand();
         let user = await User.findUser(interaction.user.id);
@@ -42,13 +43,24 @@ export default new CommandClass({
           ephemeral = false;
           points += 1;
           user.setPoints(points);
-          await user.save();
+          const roles = await Role.findRolesByPoints(points);
+          await Promise.all([
+            user.save(),
+            interaction.member.roles.add(roles[0].map(role => role.discordId)),
+            interaction.member.roles.remove(roles[1].map(role => role.discordId))
+          ]);
+          const earnedRoles = roles[0].pop();
+          if (earnedRoles?.points === points) {
+            content = 'some promotion message';
+          } else {
+            content = `**<@!${interaction.user.id}> now has ${points} points!**`;
+          }
         } else if (subcommand === 'down') {
           points -= 1;
           user.setPoints(points);
           await user.save();
+          content = `**<@!${interaction.user.id}> now has ${points} points!**`;
         }
-        content = `**<@!${interaction.user.id}> has ${points} points!**`;
       } catch (error) {
         content = error.message;
       }
