@@ -33,6 +33,8 @@ export default new CommandClass({
         const roleId = await Role.findByName(subcommand); 
         content = `**<@!${interaction.user.id}> calls for <@&${roleId.getDiscordId()}> to assemble!**`;
         ephemeral = false;
+      } else {
+        this.opt.cooldown = 0;
       }
       await interaction.reply({
         content,
