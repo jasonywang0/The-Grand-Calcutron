@@ -1,5 +1,6 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandClass } from '../../structures/command.js';
+import { Role } from '../../db/models/role.model.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()
@@ -29,8 +30,8 @@ export default new CommandClass({
       let content = 'This command can only be used in the draft channel.';
       let ephemeral = true;
       if (this.opt.channels?.includes(interaction.channelId)) {
-        const roleId = subcommand === 'xmage' ? process.env.XMAGE_ROLE : process.env.TRICE_ROLE;
-        content = `**<@!${interaction.user.id}> calls for <@&${roleId}> to assemble!**`;
+        const roleId = await Role.findByName(subcommand); 
+        content = `**<@!${interaction.user.id}> calls for <@&${roleId.getDiscordId()}> to assemble!**`;
         ephemeral = false;
       }
       await interaction.reply({

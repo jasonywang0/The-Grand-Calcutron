@@ -20,6 +20,7 @@ interface IRoleDocument extends IRole, Document {
 }
 
 interface IRoleModel extends Model<IRoleDocument> {
+  findByName: (name: string) => Promise<IRoleDocument | null>;
   findRole: (discordId: string) => Promise<IRoleDocument | null>;
   findRolesByPoints: (points: number) => Promise<[IRoleDocument[], IRoleDocument[]]>;
 }
@@ -77,6 +78,10 @@ RoleSchema.methods.setImage = function(image: Types.ObjectId) {
 RoleSchema.methods.getImage = async function() {
   return Image.findById(this.image);
 }
+
+RoleSchema.statics.findByName = async function(name: string) {
+  return this.findOne({ name });
+};
 
 RoleSchema.statics.findRole = async function(discordId) {
   return this.findOne({ discordId });

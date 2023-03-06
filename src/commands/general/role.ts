@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandClass } from '../../structures/command.js';
+import { Role } from '../../db/models/role.model.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()
@@ -48,17 +49,15 @@ export default new CommandClass({
       let content = 'Something went wrong!';
       try {
         const subcommand = interaction.options.getSubcommand();
-        const role = interaction.options.getString('role');
-        if (!role) throw new Error('Role does not exist!');
-        const roleId = role === 'xmage' ? process.env.XMAGE_ROLE : process.env.TRICE_ROLE;
+        const roleName = interaction.options.getString('role');
+        const role = await Role.findByName(roleName);
+        if (!role || !role.getDiscordId()) throw new Error('Role does not exist!');
         if (subcommand === 'add') {
-          if (role === 'xmage') await interaction.member.roles.add(roleId);
-          if (role === 'cockatrice') await interaction.member.roles.add(roleId);
-          content = `<@&${roleId}> has been added!`;
-        } else if (subcommand === 'remove') {
-          if (role === 'xmage') await interaction.member.roles.remove(roleId);
-          if (role === 'cockatrice') await interaction.member.roles.remove(roleId);
-          content = `<@&${roleId}> has been removed!`;
+          await interaction.member.roles.add(role.getDiscordId());
+          content = `<@&${role.getDiscordId()}> has been added!`;
+        } else {
+          await interaction.member.roles.remove(role.getDiscordId());
+          content = `<@&${role.getDiscordId()}> has been removed!`;
         }
       } catch (error) {
         content = error.message;
