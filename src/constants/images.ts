@@ -1,5 +1,5 @@
 enum ImageName {
-  Level = 'level',
+  Level = 'LEVEL',
 }
 
 export { ImageName }

@@ -4,7 +4,7 @@ import { IGuildChannel, GuildChannelSchema } from '../schemas/guildChannel.schem
 import { IGuildImage, GuildImageSchema } from '../schemas/guildImage.schema.js';
 import { RoleType } from '../../constants/roles.js';
 import { ChannelName } from '../../constants/channels.js';
-
+import { ImageName } from '../../constants/images.js';
 
 interface IGuild {
   discordId: string,
@@ -25,7 +25,7 @@ interface IGuildDocument extends IGuild, Document {
   getChannels: () => IGuildChannel[]
   getChannelByName: (name: ChannelName) => IGuildChannel | null
   getImages: () => IGuildImage[]
-  getImageByName: (name: string) => IGuildImage | null;
+  getImageByName: (name: ImageName) => IGuildImage | null;
   addImages: (image: IGuildImage) => void;
 }
 
@@ -81,11 +81,11 @@ GuildSchema.methods.addImages = function(image: IGuildImage) {
   this.images.push(image);
 };
 
-GuildSchema.methods.getImageByName = function(name: string) {
+GuildSchema.methods.getImageByName = function(name: ImageName) {
   const images = this.getImages();
   const image = images.find((image: IGuildImage) => image.name === name);
-  if (!image) throw new Error('Registered role not found!');
-  return images;
+  if (!image) throw new Error('Image not found!');
+  return image;
 };
 
 GuildSchema.methods.getRolesByType = function(type: RoleType) {
