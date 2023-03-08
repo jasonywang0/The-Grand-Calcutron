@@ -1,8 +1,9 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandClass } from '../../structures/command.js';
 import { User } from '../../db/models/user.model.js';
-import { Role } from '../../db/models/role.model.js';
+import { Guild } from '../../db/models/guild.model.js';
 import { createLevelGetEmbed, createLevelUpEmbed  } from '../../misc/createEmbeds.js';
+import { ChannelName } from '../../db/schemas/guildChannel.schema.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()
@@ -30,7 +31,6 @@ export default new CommandClass({
         cooldown: 5,
         visible: true,
         guildOnly: true,
-        channels: [process.env.BOT_CHANNEL]
     },
     async execute(interaction: ChatInputCommandInteraction<'cached'>) {
       let ephemeral = true;
@@ -38,35 +38,37 @@ export default new CommandClass({
       let embeds = [];
       try {
         const subcommand = interaction.options.getSubcommand();
+        const guild = await Guild.findByDiscordId(interaction.guildId);
         let user = await User.findUser(interaction.user.id);
         if (!user) user = new User({discordId: interaction.user.id});
         let points = user.getPoints();
         switch (subcommand) {
           case 'get': {
-            const roles = await Role.findRolesByPoints(points);
-            await interaction.member.roles.add(roles[0].map(role => role.getDiscordId())), // TODO: figure out why I can't put this in Promises.all
-            await interaction.member.roles.remove(roles[1].map(role => role.getDiscordId()))
-            embeds.push(await createLevelGetEmbed({interaction, points, level: roles[0].pop()}));
+            const levels = guild.getLevelsByPoints(points);
+            await interaction.member.roles.add(levels.add.map(level => level.discordId)), // TODO: figure out why I can't put this in Promises.all
+            await interaction.member.roles.remove(levels.remove.map(level => level.discordId))
+            embeds.push(await createLevelGetEmbed({interaction, points, level: levels.add.pop()}));
             break;
           }
           case 'up': {
-            if (!this.opt.channels?.includes(interaction.channelId)) throw new Error('This command can only be used in the bot channel');
+            const draftingChannel = guild.getChannelByName(ChannelName.BotSpam);
+            if (interaction.channelId !== draftingChannel.discordId) throw new Error('This command can only be used in the bot channel');
             ephemeral = false;
             points += 1;
             user.setPoints(points);
-            let roles = await Role.findRolesByPoints(points);
-            await interaction.member.roles.remove(roles[1].map(role => role.getDiscordId()));
-            await interaction.member.roles.add(roles[0].map(role => role.getDiscordId()));
-            const promises = await Promise.all([user.save(), createLevelUpEmbed({interaction, points, level: roles[0].pop()})]);
+            let levels = guild.getLevelsByPoints(points);
+            await interaction.member.roles.add(levels.add.map(level => level.discordId));
+            await interaction.member.roles.remove(levels.remove.map(level => level.discordId));
+            const promises = await Promise.all([user.save(), createLevelUpEmbed({interaction, points, level: levels.add.pop()})]);
             embeds.push(promises[1]);
             break;
           }
           case 'down': {
             points -= 1;
             user.setPoints(points);
-            let roles = await Role.findRolesByPoints(points);
-            await interaction.member.roles.remove(roles[1].map(role => role.getDiscordId()));
-            await interaction.member.roles.add(roles[0].map(role => role.getDiscordId()));
+            let levels = guild.getLevelsByPoints(points);
+            await interaction.member.roles.add(levels.add.map(level => level.discordId));
+            await interaction.member.roles.remove(levels.remove.map(level => level.discordId));
             await user.save();
             content = `**<@!${interaction.user.id}> now has ${points} points!**`;
             break;
@@ -76,7 +78,7 @@ export default new CommandClass({
             break;
         }
       } catch (error) {
-        content = error.message;
+        content = error.message;        
         embeds = [];
       }
       await interaction.reply({

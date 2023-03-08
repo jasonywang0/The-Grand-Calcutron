@@ -1,7 +1,7 @@
-import 'dotenv/config'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandClass } from '../../structures/command.js';
-import { Role } from '../../db/models/role.model.js';
+import { Guild } from '../../db/models/guild.model.js';
+import { RoleType } from '../../constants/roles.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()
@@ -17,8 +17,8 @@ export default new CommandClass({
               .setDescription('Role to add')
               .setRequired(true)
               .addChoices(
-                { name: 'Xmage', value: 'xmage' },
-                { name: 'Cockatrice', value: 'cockatrice' },
+                { name: 'Xmage', value: RoleType.Xmage },
+                { name: 'Cockatrice', value: RoleType.Cockatrice },
               )
           )
       )
@@ -32,8 +32,8 @@ export default new CommandClass({
               .setDescription('Role to remove')
               .setRequired(true)
               .addChoices(
-                { name: 'Xmage', value: 'xmage' },
-                { name: 'Cockatrice', value: 'cockatrice' },
+                { name: 'Xmage', value: RoleType.Xmage },
+                { name: 'Cockatrice', value: RoleType.Cockatrice },
               )
             )
       ) as SlashCommandBuilder,
@@ -48,16 +48,16 @@ export default new CommandClass({
     async execute(interaction: ChatInputCommandInteraction<'cached'>) {
       let content = 'Something went wrong!';
       try {
+        const guild = await Guild.findByDiscordId(interaction.guildId);
         const subcommand = interaction.options.getSubcommand();
         const roleName = interaction.options.getString('role');
-        const role = await Role.findByName(roleName);
-        if (!role || !role.getDiscordId()) throw new Error('Role does not exist!');
+        const role = guild.getRolesByType(roleName as RoleType)[0];
         if (subcommand === 'add') {
-          await interaction.member.roles.add(role.getDiscordId());
-          content = `<@&${role.getDiscordId()}> has been added!`;
+          await interaction.member.roles.add(role.discordId);
+          content = `<@&${role.discordId}> has been added!`;
         } else {
-          await interaction.member.roles.remove(role.getDiscordId());
-          content = `<@&${role.getDiscordId()}> has been removed!`;
+          await interaction.member.roles.remove(role.discordId);
+          content = `<@&${role.discordId}> has been removed!`;
         }
       } catch (error) {
         content = error.message;

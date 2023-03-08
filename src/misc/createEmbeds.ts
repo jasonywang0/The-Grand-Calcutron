@@ -1,24 +1,24 @@
 import { EmbedBuilder, ChatInputCommandInteraction } from 'discord.js';
-import { IRoleDocument }  from '../db/models/role.model.js'
-import { Image } from '../db/models/image.model.js';
+import { Guild } from '../db/models/guild.model.js';
+import { IGuildRole } from '../db/schemas/guildRole.schema.js';
+import { ImageName } from '../constants/images.js';
 
  interface levelInfo {
   interaction: ChatInputCommandInteraction<'cached'>,
-  level: IRoleDocument,
+  level: IGuildRole,
   points: number
 }
 
 export async function createLevelGetEmbed(info:levelInfo): Promise<EmbedBuilder> {
   const { interaction, level, points } = info;
-  let role = interaction.guild.roles.cache.get(level.getDiscordId());
+  let role = interaction.guild.roles.cache.get(level.discordId);
   if (!role) throw Error('Embed Failed - Role not found');
-  let image = await level.getImage();
   return new EmbedBuilder()
     .setColor(role.color)
     .setTitle(`Level Stats`)
     .setThumbnail(interaction.user.displayAvatarURL())
     .setDescription(`**<@!${interaction.user.id}> is a <@&${role.id}> with ${points} points!**`)
-    .setImage(image.getLink() || interaction.user.displayAvatarURL());
+    .setImage(level.image || interaction.user.displayAvatarURL());
 }
 
 export async function createLevelUpEmbed(info:levelInfo): Promise<EmbedBuilder> {
@@ -26,15 +26,14 @@ export async function createLevelUpEmbed(info:levelInfo): Promise<EmbedBuilder> 
   let color = 0x40863f;
   let title = 'Level Up';
   let description = `**<@!${interaction.user.id}> leveled up to ${points} points!**`;
-  const image = await Image.findByName('level');
-  let imageLink = image.getLink();
+  const guild = await Guild.findByDiscordId(interaction.guildId);
+  let imageLink = guild.getImageByName(ImageName.Level).link;
 
-  if (points === level.getPoints()) { // promotion
-    let role = interaction.guild.roles.cache.get(level.getDiscordId());
+  if (points === level.points) { // promotion
+    let role = interaction.guild.roles.cache.get(level.discordId);
     if (!role) throw Error('Embed Failed - Role not found');
-    const image: any = await level.getImage();
     color = role.color;
-    imageLink = image.getLink();
+    imageLink = level.image;
     title = `:fire: **Polymorph** :fire:`;
     description = `**<@!${interaction.user.id}> leveled up to <@&${role.id}> with ${points} points!**`;
   } 

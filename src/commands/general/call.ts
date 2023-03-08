@@ -1,6 +1,8 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandClass } from '../../structures/command.js';
-import { Role } from '../../db/models/role.model.js';
+import { Guild } from '../../db/models/guild.model.js';
+import { ChannelName } from '../../db/schemas/guildChannel.schema.js';
+import { RoleType } from '../../constants/roles.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()
@@ -8,12 +10,12 @@ export default new CommandClass({
         .setDescription('Alert drafters')
         .addSubcommand(subcommand => 
           subcommand
-            .setName('xmage')
+            .setName(RoleType.Xmage.toLowerCase())
             .setDescription('Alert Xmage users')
          )
          .addSubcommand(subcommand =>
           subcommand
-            .setName('cockatrice')
+            .setName(RoleType.Cockatrice.toLowerCase())
             .setDescription('Alert Cockatrice users')
          ) as SlashCommandBuilder,
     opt: {
@@ -22,19 +24,24 @@ export default new CommandClass({
         category: 'General',
         cooldown: 600,
         visible: true,
-        guildOnly: false,
-        channels: [process.env.DRAFT_CHANNEL]
+        guildOnly: true,
     },
     async execute(interaction: ChatInputCommandInteraction<'cached'>) {
-      const subcommand = interaction.options.getSubcommand();
       let content = 'This command can only be used in the draft channel.';
       let ephemeral = true;
-      if (this.opt.channels?.includes(interaction.channelId)) {
-        const roleId = await Role.findByName(subcommand); 
-        content = `**<@!${interaction.user.id}> calls for <@&${roleId.getDiscordId()}> to assemble!**`;
+      try {
+        const guild = await Guild.findByDiscordId(interaction.guildId);
+        const subcommand = interaction.options.getSubcommand().toUpperCase();
+        const draftingChannel = guild.getChannelByName(ChannelName.Drafting);
+        if (interaction.channelId !== draftingChannel.discordId) {
+          this.opt.cooldown = 0;
+          throw new Error(content);
+        }
+        const role = guild.getRolesByType(subcommand as RoleType)[0];
+        content = `**<@!${interaction.user.id}> calls for <@&${role.discordId}> to assemble!**`;
         ephemeral = false;
-      } else {
-        this.opt.cooldown = 0;
+      } catch (e) {
+        content = e.message;
       }
       await interaction.reply({
         content,
