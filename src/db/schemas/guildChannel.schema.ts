@@ -1,5 +1,4 @@
 import { Schema } from 'mongoose';
-import { ChannelName } from '../../constants/channels.js';
 
 interface IGuildChannel {
   name: string,
@@ -19,4 +18,4 @@ const GuildChannelSchema:Schema<IGuildChannel> = new Schema({
   }
 });
 
-export { ChannelName, GuildChannelSchema, IGuildChannel };
+export { GuildChannelSchema, IGuildChannel };
