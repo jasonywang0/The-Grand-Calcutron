@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
-import {ICube, Cube, CubeSchema} from './cube.model.js';
+import {ICube, CubeSchema} from '../schemas/cube.schema.js';
 
 interface IUser {
   discordId: string,
@@ -14,7 +14,7 @@ interface IUserDocument extends IUser, Document {
   setPoints: (points: number) => void
   getCubes: () => ICube[]
   setCubes: (cubes: ICube[]) => void 
-  addCube: (link: string) => void
+  addCube: (link: string, name?: string) => void
   findCube: (link: string) => ICube | null
   deleteCube: (link: string) => void 
 }
@@ -58,7 +58,7 @@ const UserSchema:Schema<IUserDocument> = new Schema({
     required: true,
     type: [CubeSchema]
   }
-},  {strictQuery: false});
+});
 
 UserSchema.methods.getPoints = function() {
   return this.points;
@@ -69,7 +69,7 @@ UserSchema.methods.setPoints = function (points: number) {
   this.points = points;
 };
 
-UserSchema.methods.getCubes = function() {
+UserSchema.methods.getCubes = function():ICube[] {
   return this.cubes;
 };
 
@@ -77,7 +77,7 @@ UserSchema.methods.setCubes = function(cubes: ICube[]) {
   this.cubes = cubes;
 };
 
-UserSchema.methods.addCube = function(link: string) {
+UserSchema.methods.addCube = function(link: string, name?: string) {
   try {
     // TODO: clean up
     const url = new URL(link); // can throw an error if the link is not complete
@@ -86,8 +86,7 @@ UserSchema.methods.addCube = function(link: string) {
     }
     const cubes = this.getCubes();
     if (cubes.length > 5) throw new Error('Cube limit reached!');  
-    const cube = new Cube({link});
-    cubes.push(cube);
+    cubes.push({link, name});
   } catch (e) {
     if (e.code === 'ERR_INVALID_URL') e.message = `URL must be a complete link from cube cobra or artisan. Here's an example: https://cubecobra.com/cube/list/thunderwang`;
     throw e;
@@ -96,7 +95,8 @@ UserSchema.methods.addCube = function(link: string) {
 
 UserSchema.methods.findCube = function(link: string) {
   const cube = this.cubes.find((cube:ICube) => cube.link.toLowerCase() === link.toLowerCase());
-  return cube || null; 
+  if (!cube) throw new Error('Cube could not be found!');
+  return cube;
 }
 
 UserSchema.methods.deleteCube = function(link: string) {
@@ -105,7 +105,8 @@ UserSchema.methods.deleteCube = function(link: string) {
 }
 
 UserSchema.statics.findUser = async function(discordId) {
-  return this.findOne({ discordId });
+  const user = await this.findOne({ discordId });
+  return user;
 };
 
 UserSchema.statics.findUserAndUpdate = async function(discordId, payload)  {

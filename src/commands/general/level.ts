@@ -3,7 +3,7 @@ import { CommandClass } from '../../structures/command.js';
 import { User } from '../../db/models/user.model.js';
 import { Guild } from '../../db/models/guild.model.js';
 import { createLevelGetEmbed, createLevelUpEmbed  } from '../../misc/createEmbeds.js';
-import { ChannelName } from '../../db/schemas/guildChannel.schema.js';
+import { ChannelName } from '../../constants/channels.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()

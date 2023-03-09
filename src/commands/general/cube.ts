@@ -68,8 +68,7 @@ export default new CommandClass({
             await user.save();
             content = `${option} has been added!`;
           } else if (subcommand === 'delete') {
-            const cube = user.findCube(option);
-            if (!cube) throw new Error('Cube could not be found!');
+            user.findCube(option); // just check to see if something will be found
             user.deleteCube(option);
             await user.save();
             content = `${option} has been deleted!`;

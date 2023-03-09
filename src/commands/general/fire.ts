@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandClass } from '../../structures/command.js';
-import { ChannelName } from '../../db/schemas/guildChannel.schema.js';
 import { Guild } from '../../db/models/guild.model.js';
+import { ChannelName } from '../../constants/channels.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()
