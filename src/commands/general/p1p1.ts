@@ -49,6 +49,7 @@ export default new CommandClass({
       }
       await interaction.reply({
         content,
+        ephemeral,
         fetchReply: true,
       });
     },
