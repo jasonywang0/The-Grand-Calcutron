@@ -5,6 +5,7 @@ import { IGuildImage, GuildImageSchema } from '../schemas/guildImage.schema.js';
 import { RoleType } from '../../constants/roles.js';
 import { ChannelName } from '../../constants/channels.js';
 import { ImageName } from '../../constants/images.js';
+import { CustomError } from '../../structures/error.js';
 
 interface IGuild {
   discordId: string,
@@ -84,21 +85,21 @@ GuildSchema.methods.addImages = function(image: IGuildImage) {
 GuildSchema.methods.getImageByName = function(name: ImageName) {
   const images = this.getImages();
   const image = images.find((image: IGuildImage) => image.name === name);
-  if (!image) throw new Error('Image not found!');
+  if (!image) throw new CustomError(null, 'Image not found!');
   return image;
 };
 
 GuildSchema.methods.getRolesByType = function(type: RoleType) {
   const roles = this.getRoles();
   const foundRoles = roles.filter((role: IGuildRole) => role.type === type);
-  if (!foundRoles.length) throw new Error('No roles found!');
+  if (!foundRoles.length) throw new CustomError(null, 'No roles found!');
   return foundRoles;
 };
 
 GuildSchema.methods.getLevelsByPoints = function(points: number): ILevels {
   const roles = this.getRoles();
   let allLevels = roles.filter((role: IGuildRole) => role.type === RoleType.Level);
-  if (!allLevels.length) throw new Error('No levels registered!');
+  if (!allLevels.length) throw new CustomError(null, 'No levels registered!');
   allLevels = allLevels.sort((a, b) => a.points - b.points);
   const levels: ILevels = {
     add: [],
@@ -111,13 +112,13 @@ GuildSchema.methods.getLevelsByPoints = function(points: number): ILevels {
 GuildSchema.methods.getChannelByName = function(name: ChannelName) {
   const channels = this.getChannels();
   const channel = channels.find((c) => c.name === name);
-  if (!channel) throw new Error('Registered Channel could not be found!');
+  if (!channel) throw new CustomError(null, 'Registered Channel could not be found!');
   return channel;
 }
 
 GuildSchema.statics.findByDiscordId = async function(discordId: string) {
   const guild = await this.findOne({discordId});
-  if (!guild) throw Error('No Guild found!');
+  if (!guild) throw new CustomError(null, 'No Guild found!');
   return guild;
 };
 

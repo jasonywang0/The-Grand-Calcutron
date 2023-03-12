@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandClass } from '../../structures/command.js';
 import { User } from '../../db/models/user.model.js';
+import { CustomError } from '../../structures/error.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()
@@ -48,15 +49,15 @@ export default new CommandClass({
         guildOnly: true,
     },
     async execute(interaction: ChatInputCommandInteraction<'cached'>) {
-      let content = 'Something went wrong!';
+      let content = this.errorMessage;
       try {
         const subcommand = interaction.options.getSubcommand();
         if (subcommand === 'get') {
           let dsUser = interaction.options.getUser('user');
-          if (!dsUser) throw new Error('User could not found be in guild!');
+          if (!dsUser) throw new Error('Discord user could not found be in guild!');
           let user = await User.findUser(dsUser.id);
           const cubes = user?.getCubes() || [];
-          if (!cubes.length) throw new Error(`**<@!${dsUser.id}>** has no cubes set.`);
+          if (!cubes.length) throw new CustomError('USER_CUBE_1', `**<@!${dsUser.id}>** has no cubes set.`);
           content = `**<@!${dsUser.id}>'s Cubes**`;
           cubes.forEach((cube) => content += `\n${cube.link}`);
         } else {
@@ -75,10 +76,7 @@ export default new CommandClass({
           }
         }
       } catch (error) {
-        if (error.code === 'ERR_INVALID_URL') {
-          content = `URL must be a complete link from cube cobra. Here's an example: https://cubecobra.com/cube/list/thunderwang`
-        }
-        content = error.message;
+        content = error instanceof CustomError ? error.message : this.errorMessage;
       }
       await interaction.reply({
         content,

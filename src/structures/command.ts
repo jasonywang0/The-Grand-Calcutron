@@ -19,6 +19,7 @@ interface CommandOptions {
 export class CommandClass {
     data: CommandOptions['data'];
     opt?: CommandOptions['opt'];
+    errorMessage: 'Something went wrong!';
     execute: CommandOptions['execute'];
 
     constructor(options: CommandOptions) {

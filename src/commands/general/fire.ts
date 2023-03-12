@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandClass } from '../../structures/command.js';
 import { Guild } from '../../db/models/guild.model.js';
 import { ChannelName } from '../../constants/channels.js';
+import { CustomError } from '../../structures/error.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()
@@ -16,8 +17,8 @@ export default new CommandClass({
         guildOnly: true,
     },
     async execute(interaction: ChatInputCommandInteraction<'cached'>) {
-      let content = 'This command can only be used in the draft channel.';
-      let ephemeral = true;
+      let content = this.errorMessage;
+      let ephemeral = false;
       try {
         const guild = await Guild.findByDiscordId(interaction.guildId);
         const draftingChannel = guild.getChannelByName(ChannelName.Drafting);
@@ -26,9 +27,9 @@ export default new CommandClass({
           throw new Error(content);
         }
         content = 'The draft has fired! Good luck and please save your decklists :pray:';
-        ephemeral = false;
-      } catch (e) {
-        content = e.message;
+      } catch (error) {
+        content = error instanceof CustomError ? error.message : this.errorMessage;
+        ephemeral = true;
       }
       await interaction.reply({
         content,

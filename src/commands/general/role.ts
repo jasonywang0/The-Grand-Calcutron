@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandClass } from '../../structures/command.js';
 import { Guild } from '../../db/models/guild.model.js';
 import { RoleType } from '../../constants/roles.js';
+import { CustomError } from '../../structures/error.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()
@@ -46,7 +47,7 @@ export default new CommandClass({
         guildOnly: true,
     },
     async execute(interaction: ChatInputCommandInteraction<'cached'>) {
-      let content = 'Something went wrong!';
+      let content = this.errorMessage;
       try {
         const guild = await Guild.findByDiscordId(interaction.guildId);
         const subcommand = interaction.options.getSubcommand();
@@ -60,7 +61,7 @@ export default new CommandClass({
           content = `<@&${role.discordId}> has been removed!`;
         }
       } catch (error) {
-        content = error.message;
+        content = error instanceof CustomError ? error.message : this.errorMessage;
       }
       await interaction.reply({
         content,

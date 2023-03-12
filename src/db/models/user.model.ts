@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
+import { CustomError } from '../../structures/error.js';
 import {ICube, CubeSchema} from '../schemas/cube.schema.js';
 
 interface IUser {
@@ -20,7 +21,7 @@ interface IUserDocument extends IUser, Document {
 }
 
 interface IUserModel extends Model<IUserDocument> {
-  findUser: (discordId: string) => Promise<IUserDocument>;
+  findUser: (discordId: string) => Promise<IUserDocument | null>;
   findUserAndUpdate: (discordId: string, payload: any) => Promise<IUserDocument>;
   findUserAndLevel: (discordId: string, amount: number) => Promise<IUserDocument>;
 }
@@ -79,17 +80,14 @@ UserSchema.methods.setCubes = function(cubes: ICube[]) {
 
 UserSchema.methods.addCube = function(link: string, name?: string) {
   try {
-    // TODO: clean up
     const url = new URL(link); // can throw an error if the link is not complete
-    if (url.hostname !== 'cubecobra.com' && url.hostname !== 'cubeartisan.net') {
-      throw new Error(`URL must be a complete link from cube cobra or artisan. Here's an example: https://cubecobra.com/cube/list/thunderwang`);
-    }
+    if (url.hostname !== 'cubecobra.com' && url.hostname !== 'cubeartisan.net') throw new CustomError('CUBE_PARSE_1');
     const cubes = this.getCubes();
-    if (cubes.length > 5) throw new Error('Cube limit reached!');  
+    if (cubes.length > 5) throw new CustomError('USER_CUBE_LIMIT_1');  
     cubes.push({link, name});
   } catch (e) {
-    if (e.code === 'ERR_INVALID_URL') e.message = `URL must be a complete link from cube cobra or artisan. Here's an example: https://cubecobra.com/cube/list/thunderwang`;
-    throw e;
+    if (e.code === 'ERR_INVALID_URL') throw new CustomError('CUBE_PARSE_1');
+    
   }
 }
 
@@ -104,9 +102,8 @@ UserSchema.methods.deleteCube = function(link: string) {
   if (index >= 0) this.cubes.splice(index, 1);
 }
 
-UserSchema.statics.findUser = async function(discordId) {
-  const user = await this.findOne({ discordId });
-  return user;
+UserSchema.statics.findUser = async function(discordId): Promise<IUserDocument | null> {
+  return this.findOne({ discordId });
 };
 
 UserSchema.statics.findUserAndUpdate = async function(discordId, payload)  {

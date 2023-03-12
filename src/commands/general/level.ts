@@ -4,6 +4,7 @@ import { User } from '../../db/models/user.model.js';
 import { Guild } from '../../db/models/guild.model.js';
 import { createLevelGetEmbed, createLevelUpEmbed  } from '../../misc/createEmbeds.js';
 import { ChannelName } from '../../constants/channels.js';
+import { CustomError } from '../../structures/error.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()
@@ -33,8 +34,8 @@ export default new CommandClass({
         guildOnly: true,
     },
     async execute(interaction: ChatInputCommandInteraction<'cached'>) {
+      let content = this.errorMessage;
       let ephemeral = true;
-      let content = '';
       let embeds = [];
       try {
         const subcommand = interaction.options.getSubcommand();
@@ -74,11 +75,12 @@ export default new CommandClass({
             break;
           }
           default:
-            content = 'Something went wrong!';
+            content = 'No choice was given!';
             break;
         }
       } catch (error) {
-        content = error.message;        
+        content = error instanceof CustomError ? error.message : this.errorMessage;
+        ephemeral = true;
         embeds = [];
       }
       await interaction.reply({
