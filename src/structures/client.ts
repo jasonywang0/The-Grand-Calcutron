@@ -18,7 +18,8 @@ export class ExtendedClient extends Client {
                 GatewayIntentBits.Guilds,
                 GatewayIntentBits.GuildMessages,
                 GatewayIntentBits.GuildMembers,
-                GatewayIntentBits.DirectMessages
+                GatewayIntentBits.DirectMessages,
+                GatewayIntentBits.MessageContent,
             ],
             failIfNotExists: false,
             rest: {

@@ -1,7 +1,8 @@
 enum ChannelName {
   BotSpam = 'BOT_SPAM',
   Drafting = 'DRAFTING',
-  Welcome = 'WELCOME'
+  Welcome = 'WELCOME',
+  Deals = 'DEALS'
 };
 
 export { ChannelName }
