@@ -82,5 +82,6 @@ export class ExtendedClient extends Client {
       this.loadModules();
       mongoose.set('strictQuery', false);
       await mongoose.connect(process.env.MONGOOSE);
+      console.log('Mongoose connected');
     };
 };

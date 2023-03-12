@@ -21,12 +21,12 @@ interface IGuildDocument extends IGuild, Document {
   getAdminDiscordId: () => string
   setAdminDiscordId: (discordId: string) => void
   getRoles: () => IGuildRole[]
-  getRolesByType: (type: RoleType) => IGuildRole[] | null
+  getRolesByType: (type: RoleType) => IGuildRole[]
   getLevelsByPoints: (points: number) => ILevels
   getChannels: () => IGuildChannel[]
-  getChannelByName: (name: ChannelName) => IGuildChannel | null
+  getChannelByName: (name: ChannelName) => IGuildChannel
   getImages: () => IGuildImage[]
-  getImageByName: (name: ImageName) => IGuildImage | null;
+  getImageByName: (name: ImageName) => IGuildImage
   addImages: (image: IGuildImage) => void;
 }
 
@@ -124,4 +124,4 @@ GuildSchema.statics.findByDiscordId = async function(discordId: string) {
 
 const Guild = mongoose.model<IGuildDocument, IGuildModel>('Guild', GuildSchema);
 
-export { Guild };
+export { Guild, IGuildDocument };
