@@ -66,7 +66,7 @@ UserSchema.methods.getPoints = function() {
 };
 
 UserSchema.methods.setPoints = function (points: number) {
-  if (points < 0) throw new Error('Points can not be below 0');
+  if (points < 0) throw new CustomError(null, 'Points can not be below 0');
   this.points = points;
 };
 
