@@ -21,7 +21,7 @@ export default new CommandClass({
         .addSubcommand(subcommand => 
           subcommand
             .setName('add')
-            .setDescription('Add cubes')
+            .setDescription('Add cube')
             .addStringOption(option =>
               option
                 .setName('url')
@@ -31,8 +31,8 @@ export default new CommandClass({
         )
         .addSubcommand(subcommand => 
           subcommand
-            .setName('delete')
-            .setDescription('Delete cubes')
+            .setName('remove')
+            .setDescription('Remove cube')
             .addStringOption(option =>
               option
                 .setName('url')
