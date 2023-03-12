@@ -14,7 +14,7 @@ export default new EventClass({
       const levels = guild.getLevelsByPoints(0);
       await guildMember.roles.add(levels.add[0].discordId);
       const embed = await createWelcomeEmbed(guildMember, guild);
-      (discordWelcomeChannel as TextChannel).send({embeds: [embed]});
+      (discordWelcomeChannel as TextChannel).send({embeds: [embed], allowedMentions: { parse: [] }});
     } catch (error) {
       // TODO: do something here
     }
