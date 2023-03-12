@@ -11,7 +11,7 @@ const ErrorCodes = {
 class CustomError<K extends keyof typeof ErrorCodes> extends Error {
   code: string
   constructor(code:K, customMessage?: string) {
-    let message = ErrorCodes[code].message || 'Something went wrong!';
+    let message = ErrorCodes[code]?.message || 'Something went wrong!';
     if (customMessage) message = customMessage;
     super(message);
     this.code = code;
