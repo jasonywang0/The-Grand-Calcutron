@@ -87,7 +87,7 @@ UserSchema.methods.addCube = function(link: string, name?: string) {
     cubes.push({link, name});
   } catch (e) {
     if (e.code === 'ERR_INVALID_URL') throw new CustomError('CUBE_PARSE_1');
-    
+    throw e;
   }
 }
 
