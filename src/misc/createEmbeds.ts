@@ -34,7 +34,6 @@ export async function createLevelUpEmbed(info:levelInfo): Promise<EmbedBuilder> 
     if (!role) throw new CustomError('EMBED_ROLE_FOUND_1');
     color = role.color;
     imageLink = level.image;
-    title = `:fire: **Polymorph** :fire:`;
     description = `**<@!${interaction.user.id}> leveled up to <@&${role.id}> with ${points} points!**`;
   } 
   return new EmbedBuilder()
