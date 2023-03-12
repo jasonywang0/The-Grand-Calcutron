@@ -34,7 +34,7 @@ export default new CommandClass({
         guildOnly: true,
     },
     async execute(interaction: ChatInputCommandInteraction<'cached'>) {
-      let content = this.errorMessage;
+      let content = '';
       let ephemeral = true;
       let embeds = [];
       try {
@@ -53,7 +53,7 @@ export default new CommandClass({
           }
           case 'up': {
             const draftingChannel = guild.getChannelByName(ChannelName.BotSpam);
-            if (interaction.channelId !== draftingChannel.discordId) throw new Error('This command can only be used in the bot channel');
+            if (interaction.channelId !== draftingChannel.discordId) throw new CustomError('CHANNEL_INVALID_1', 'This command can only be used in the bot channel');
             ephemeral = false;
             points += 1;
             user.setPoints(points);
@@ -75,7 +75,7 @@ export default new CommandClass({
             break;
           }
           default:
-            content = 'No choice was given!';
+            content = 'No choice was selected!';
             break;
         }
       } catch (error) {
