@@ -12,12 +12,12 @@ export default new CommandClass({
         .addSubcommand(subcommand => 
           subcommand
             .setName(RoleType.Xmage.toLowerCase())
-            .setDescription('Alert Xmage users')
+            .setDescription('Call Xmage users')
          )
          .addSubcommand(subcommand =>
           subcommand
             .setName(RoleType.Cockatrice.toLowerCase())
-            .setDescription('Alert Cockatrice users')
+            .setDescription('Call Cockatrice users')
          ) as SlashCommandBuilder,
     opt: {
         userPermissions: ['SendMessages'],
