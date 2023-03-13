@@ -42,7 +42,6 @@ const GuildSchema:Schema<IGuildDocument> = new Schema({
   },
   adminDiscordId: {
     type: String,
-    unique: true,
     required: true,
   },
   roles: [GuildRoleSchema],
