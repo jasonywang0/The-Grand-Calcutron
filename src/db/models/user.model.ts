@@ -82,7 +82,7 @@ UserSchema.methods.addCube = function(link: string, name?: string) {
     const url = new URL(link); // can throw an error if the link is not complete
     if (url.hostname !== 'cubecobra.com' && url.hostname !== 'cubeartisan.net') throw new CustomError('CUBE_PARSE_1');
     const cubes = this.getCubes();
-    if (cubes.length > 5) throw new CustomError('USER_CUBE_LIMIT_1');  
+    if (cubes.length >= 5) throw new CustomError('USER_CUBE_LIMIT_1');  
     cubes.push({link: link.replace(/\/+$/, ''), name }); // always remove the trailing slashs because Discord adds them automatically
   } catch (e) {
     if (e.code === 'ERR_INVALID_URL') throw new CustomError('CUBE_PARSE_1');
