@@ -61,7 +61,7 @@ export default new CommandClass({
           let user = await User.findUser(dsUser.id);
           const cubes = user?.getCubes();
           if (!cubes || !cubes.length) throw new CustomError('USER_CUBE_1', `**<@!${dsUser.id}>** has no cubes set.`);
-          const embed = createCubesEmbed(interaction.user, cubes);
+          const embed = createCubesEmbed(dsUser, cubes);
           embeds.push(embed);
           content = '';
         } else {

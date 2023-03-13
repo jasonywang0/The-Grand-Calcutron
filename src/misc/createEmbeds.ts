@@ -64,6 +64,5 @@ export function createCubesEmbed(discordUser:User, cubes: ICube[]) {
   return new EmbedBuilder()
     .setColor(0x40863f)
     .setTitle(`${discordUser.username}'s Cubes`)
-    .setThumbnail(discordUser.displayAvatarURL())
     .setDescription(description);
 }
