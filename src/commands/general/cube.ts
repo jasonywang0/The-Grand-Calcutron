@@ -69,10 +69,9 @@ export default new CommandClass({
             await user.save();
             content = `${option} has been added!`;
           } else if (subcommand === 'remove') {
-            user.findCube(option); // just check to see if something will be found
-            user.deleteCube(option);
+            const deletedCube = user.deleteCube(option);
             await user.save();
-            content = `${option} has been deleted!`;
+            content = `${deletedCube.link} has been deleted!`;
           }
         }
       } catch (error) {

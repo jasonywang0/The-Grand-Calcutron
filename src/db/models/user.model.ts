@@ -16,8 +16,7 @@ interface IUserDocument extends IUser, Document {
   getCubes: () => ICube[]
   setCubes: (cubes: ICube[]) => void 
   addCube: (link: string, name?: string) => void
-  findCube: (link: string) => ICube | null
-  deleteCube: (link: string) => void 
+  deleteCube: (link: string) => ICube
 }
 
 interface IUserModel extends Model<IUserDocument> {
@@ -84,22 +83,17 @@ UserSchema.methods.addCube = function(link: string, name?: string) {
     if (url.hostname !== 'cubecobra.com' && url.hostname !== 'cubeartisan.net') throw new CustomError('CUBE_PARSE_1');
     const cubes = this.getCubes();
     if (cubes.length > 5) throw new CustomError('USER_CUBE_LIMIT_1');  
-    cubes.push({link, name});
+    cubes.push({link: link.replace(/\/+$/, ''), name }); // always remove the trailing slashs because Discord adds them automatically
   } catch (e) {
     if (e.code === 'ERR_INVALID_URL') throw new CustomError('CUBE_PARSE_1');
     throw e;
   }
 }
 
-UserSchema.methods.findCube = function(link: string) {
-  const cube = this.cubes.find((cube:ICube) => cube.link.toLowerCase() === link.toLowerCase());
-  if (!cube) throw new Error('Cube could not be found!');
-  return cube;
-}
-
 UserSchema.methods.deleteCube = function(link: string) {
-  const index = this.cubes.findIndex((cube:ICube) => cube.link.toLowerCase() === link.toLowerCase());
-  if (index >= 0) this.cubes.splice(index, 1);
+  const index = this.cubes.findIndex((cube:ICube) => cube.link.toLowerCase().replace(/\/+$/, '') === link.toLowerCase().replace(/\/+$/, ''));
+  if (index >= 0) return this.cubes.splice(index, 1)[0];
+  throw new CustomError(null, 'Cube not set');
 }
 
 UserSchema.statics.findUser = async function(discordId): Promise<IUserDocument | null> {
