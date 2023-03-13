@@ -71,7 +71,7 @@ export default new CommandClass({
           } else if (subcommand === 'remove') {
             const deletedCube = user.deleteCube(option);
             await user.save();
-            content = `${deletedCube.link} has been deleted!`;
+            content = `${deletedCube.link} has been removed!`;
           }
         }
       } catch (error) {
