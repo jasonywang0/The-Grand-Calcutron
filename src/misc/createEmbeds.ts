@@ -52,7 +52,6 @@ export async function createWelcomeEmbed(guildMember: GuildMember, guild:IGuildD
   return new EmbedBuilder() 
     .setColor(role.color)
     .setTitle(`Welcome ${guildMember.user.username}!`)
-    .setThumbnail(guildMember.user.displayAvatarURL())
-    .setDescription(`**<@!${process.env.CLIENT_ID}> polymorphed <@!${guildMember.user.id}> into a <@&${role.id}>**`)
-    .setImage(levels.add[0].image);
+    .setThumbnail(guild.getLevelsByPoints(0).add[0].image)
+    .setDescription(`**<@!${process.env.CLIENT_ID}> polymorphed <@!${guildMember.user.id}> into a <@&${role.id}> Check out the rules channel to get started!**`);
 }
