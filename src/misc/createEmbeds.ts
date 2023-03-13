@@ -3,7 +3,9 @@ import { Guild, IGuildDocument } from '../db/models/guild.model.js';
 import { IGuildRole } from '../db/schemas/guildRole.schema.js';
 import { ImageName } from '../constants/images.js';
 import { CustomError } from '../structures/error.js';
- interface levelInfo {
+import { ICube } from '../db/schemas/cube.schema.js';
+import { User } from 'discord.js';
+interface levelInfo {
   interaction: ChatInputCommandInteraction<'cached'>,
   level: IGuildRole,
   points: number
@@ -54,4 +56,14 @@ export async function createWelcomeEmbed(guildMember: GuildMember, guild:IGuildD
     .setTitle(`Welcome ${guildMember.displayName}!`)
     .setThumbnail(guild.getLevelsByPoints(0).add[0].image)
     .setDescription(`<@!${process.env.CLIENT_ID}> polymorphed **${guildMember.displayName}** into a <@&${role.id}> Check out the rules channel to get started!`);
+}
+
+export function createCubesEmbed(discordUser:User, cubes: ICube[]) {
+  let description = '';
+  cubes.forEach((cube, index) => description += `${index + 1}. ${cube.link}\n`);
+  return new EmbedBuilder()
+    .setColor(0x40863f)
+    .setTitle(`${discordUser.username}'s Cubes`)
+    .setThumbnail(discordUser.displayAvatarURL())
+    .setDescription(description);
 }

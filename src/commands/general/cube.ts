@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandClass } from '../../structures/command.js';
 import { User } from '../../db/models/user.model.js';
 import { CustomError } from '../../structures/error.js';
+import { createCubesEmbed } from '../../misc/createEmbeds.js';
 
 export default new CommandClass({
     data: new SlashCommandBuilder()
@@ -50,16 +51,19 @@ export default new CommandClass({
     },
     async execute(interaction: ChatInputCommandInteraction<'cached'>) {
       let content = this.errorMessage;
+      let suppressEmbed = false;
+      const embeds = [];
       try {
         const subcommand = interaction.options.getSubcommand();
         if (subcommand === 'get') {
           let dsUser = interaction.options.getUser('user');
           if (!dsUser) throw new Error('Discord user could not found be in guild!');
           let user = await User.findUser(dsUser.id);
-          const cubes = user?.getCubes() || [];
-          if (!cubes.length) throw new CustomError('USER_CUBE_1', `**<@!${dsUser.id}>** has no cubes set.`);
-          content = `**<@!${dsUser.id}>'s Cubes**`;
-          cubes.forEach((cube) => content += `\n${cube.link}`);
+          const cubes = user?.getCubes();
+          if (!cubes || !cubes.length) throw new CustomError('USER_CUBE_1', `**<@!${dsUser.id}>** has no cubes set.`);
+          const embed = createCubesEmbed(interaction.user, cubes);
+          embeds.push(embed);
+          content = '';
         } else {
           let user = await User.findUser(interaction.user.id);
           if (!user) user = new User({discordId: interaction.user.id});
@@ -68,6 +72,7 @@ export default new CommandClass({
             user.addCube(option);
             await user.save();
             content = `${option} has been added!`;
+            suppressEmbed = true;
           } else if (subcommand === 'remove') {
             const deletedCube = user.deleteCube(option);
             await user.save();
@@ -77,11 +82,15 @@ export default new CommandClass({
       } catch (error) {
         content = error instanceof CustomError ? error.message : this.errorMessage;
       }
-      await interaction.reply({
+
+      // TODO: TYPE THIS
+      const options:any = {
         content,
+        embeds,
         ephemeral: true,
         fetchReply: true,
-        flags: 'SuppressEmbeds'
-      });
+      }
+      if (suppressEmbed) options.flags = 'SuppressEmbeds';
+      await interaction.reply(options);
     },
 })
