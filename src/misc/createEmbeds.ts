@@ -34,7 +34,8 @@ export async function createLevelUpEmbed(info:levelInfo): Promise<EmbedBuilder> 
     if (!role) throw new CustomError('EMBED_ROLE_FOUND_1');
     color = role.color;
     imageLink = level.image;
-    description = `**<@!${interaction.user.id}> leveled up to <@&${role.id}> with ${points} points!**`;
+    const pointsGrammar = points === 1 ? 'point' : 'points'; 
+    description = `**<@!${interaction.user.id}> leveled up to <@&${role.id}> with ${points} ${pointsGrammar}!**`;
   } 
   return new EmbedBuilder()
     .setColor(color)
