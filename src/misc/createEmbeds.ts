@@ -51,7 +51,7 @@ export async function createWelcomeEmbed(guildMember: GuildMember, guild:IGuildD
   if (!role) throw new CustomError('EMBED_ROLE_FOUND_1');
   return new EmbedBuilder() 
     .setColor(role.color)
-    .setTitle(`Welcome ${guildMember.user.username}!`)
+    .setTitle(`Welcome ${guildMember.displayName}!`)
     .setThumbnail(guild.getLevelsByPoints(0).add[0].image)
-    .setDescription(`**<@!${process.env.CLIENT_ID}> polymorphed <@!${guildMember.user.id}> into a <@&${role.id}> Check out the rules channel to get started!**`);
+    .setDescription(`<@!${process.env.CLIENT_ID}> polymorphed **${guildMember.displayName}** into a <@&${role.id}> Check out the rules channel to get started!`);
 }
