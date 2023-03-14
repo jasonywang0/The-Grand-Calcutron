@@ -24,7 +24,7 @@ export default new CommandClass({
         const draftingChannel = guild.getChannelByName(ChannelName.Drafting);
         if (interaction.channelId !== draftingChannel.discordId) {
           this.opt.cooldown = 0;
-          throw new Error(content);
+          throw new CustomError('CHANNEL_INVALID_1', 'This command can only be used in the drafting channel!');
         }
         content = 'The draft has fired! Good luck and please save your decklists :pray:';
       } catch (error) {
