@@ -51,7 +51,7 @@ export default new CommandClass({
     },
     async execute(interaction: ChatInputCommandInteraction<'cached'>) {
       let content = this.errorMessage;
-      let suppressEmbed = false;
+      let suppressEmbed = true;
       const embeds = [];
       try {
         const subcommand = interaction.options.getSubcommand();
@@ -64,6 +64,7 @@ export default new CommandClass({
           const embed = createCubesEmbed(dsUser, cubes);
           embeds.push(embed);
           content = '';
+          suppressEmbed = false;
         } else {
           let user = await User.findUser(interaction.user.id);
           if (!user) user = new User({discordId: interaction.user.id});
@@ -72,7 +73,6 @@ export default new CommandClass({
             user.addCube(option);
             await user.save();
             content = `${option} has been added!`;
-            suppressEmbed = true;
           } else if (subcommand === 'remove') {
             const deletedCube = user.deleteCube(option);
             await user.save();
@@ -81,6 +81,7 @@ export default new CommandClass({
         }
       } catch (error) {
         content = error instanceof CustomError ? error.message : this.errorMessage;
+        suppressEmbed = true;
       }
 
       // TODO: TYPE THIS
