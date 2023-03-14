@@ -1,5 +1,5 @@
 {
-  "name": "sample-bot",
+  "name": "the-grand-calcutron",
   "version": "1.0.0",
   "description": "Basic discord bot using discord.js with typescript",
   "main": "dist/index.js",
@@ -14,20 +14,6 @@
     "start": "npm run build && npm run start:prod",
     "deploy": "node dist/deploy-commands.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/joeyk710/sample-discordjs-bot.git"
-  },
-  "bugs": {
-    "url": "https://github.com/joeyk710/sample-discordjs-bot/issues"
-  },
-  "homepage": "https://github.com/joeyk710/sample-discordjs-bot#readme",
-  "keywords": [
-    "discordjs",
-    "discord-bot",
-    "discord-api",
-    "typescript-discord-bot"
-  ],
   "directories": {
     "lib": "src"
   },
