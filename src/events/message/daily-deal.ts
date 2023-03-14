@@ -13,8 +13,8 @@ export default new EventClass({
         try {
 
           const guild = await Guild.findByDiscordId(process.env.GUILD_ID);
-          const registeredChannel = guild.getChannelByName(ChannelName.Deals)  
-          const mtgaDailyDealChannel = message.guild.channels.cache.get(registeredChannel.discordId);
+          const registeredChannel = guild.getChannelByName(ChannelName.Deals);
+          const mtgaDailyDealChannel = message.client.guilds.cache.get(process.env.GUILD_ID).channels.cache.get(registeredChannel.discordId);
   
           // parse message (see above for example)
           const [tweet, profilePic, imageStrings] = message.content.split('@@@@@');
