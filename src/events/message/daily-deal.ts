@@ -9,9 +9,8 @@ import { ChannelName } from '../../constants/channels.js';
 export default new EventClass({
     name: Events.MessageCreate,
     async execute(message) {  
-      if ((message.author.id === '801911051355553864'|| message.author.id === '132761947975188480') && message.content.toLowerCase().includes('the #mtgarena daily deals for today')) {
+      if ((message.author.id === '802369375432736788'|| message.author.id === '132761947975188480') && message.content.toLowerCase().includes('the #mtgarena daily deals for today')) {
         try {
-
           const guild = await Guild.findByDiscordId(process.env.GUILD_ID);
           const registeredChannel = guild.getChannelByName(ChannelName.Deals);
           const mtgaDailyDealChannel = message.client.guilds.cache.get(process.env.GUILD_ID).channels.cache.get(registeredChannel.discordId);
