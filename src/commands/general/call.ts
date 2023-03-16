@@ -30,6 +30,7 @@ export default new CommandClass({
     async execute(interaction: ChatInputCommandInteraction<'cached'>) {
       let content = this.errorMessage;
       let ephemeral = false;
+      let role = null;
       try {
         const guild = await Guild.findByDiscordId(interaction.guildId);
         const subcommand = interaction.options.getSubcommand().toUpperCase();
@@ -38,7 +39,7 @@ export default new CommandClass({
           this.opt.cooldown = 0;
           throw new CustomError('CHANNEL_INVALID_1', `This command can only be called in the ${draftingChannel.name} channel!`);
         }
-        const role = guild.getRolesByType(subcommand as RoleType)[0];
+        role = guild.getRolesByType(subcommand as RoleType)[0];
         content = `**<@!${interaction.user.id}> calls for <@&${role.discordId}> to assemble!**`;
       } catch (error) {
         content = error instanceof CustomError ? error.message : this.errorMessage;
@@ -47,6 +48,7 @@ export default new CommandClass({
       await interaction.reply({
         content,
         ephemeral,
+        allowedMentions: {roles: [role?.discordId]},
         fetchReply: true,
       });
     },
