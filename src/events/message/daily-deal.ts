@@ -38,15 +38,17 @@ export default new EventClass({
             .setURL(tweetURL)
             .setImage(images.shift().url);
   
-           await (mtgaDailyDealChannel as TextChannel).send({embeds: [messageEmbed]});
-  
+          const m = await (mtgaDailyDealChannel as TextChannel).send({embeds: [messageEmbed]});
+          await m.crosspost();
+
           // send the rest of the images in separate new embed messages
           for (const extraImage of images) {
             const discordEmbed = new EmbedBuilder()
               .setThumbnail(null)
               .setColor('#1DA1F2')
               .setImage(extraImage.url);
-            await (mtgaDailyDealChannel as TextChannel).send({embeds: [discordEmbed]});
+            const m = await (mtgaDailyDealChannel as TextChannel).send({embeds: [discordEmbed]});
+            await m.crosspost();
           }
         } catch (e) {
           console.log(e);
