@@ -40,7 +40,9 @@ export default new CommandClass({
           throw new CustomError('CHANNEL_INVALID_1', `This command can only be called in the ${draftingChannel.name} channel!`);
         }
         role = guild.getRolesByType(subcommand as RoleType)[0];
-        content = `**<@!${interaction.user.id}> calls for <@&${role.discordId}> to assemble!**`;
+        const discordUser = await interaction.guild.members.fetch(interaction.member.id);
+        if (!discordUser) throw new Error('Something went wrong!'); // TODO: use custom error
+        content = `${discordUser.displayName || discordUser.user.username} calls for <@&${role.discordId}> to assemble!`;
       } catch (error) {
         content = error instanceof CustomError ? error.message : this.errorMessage;
         ephemeral = true;
