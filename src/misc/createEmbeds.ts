@@ -1,8 +1,7 @@
-import { EmbedBuilder,  GuildMember } from 'discord.js';
+import { EmbedBuilder, GuildMember } from 'discord.js';
 import { IGuildDocument } from '../db/models/guild.model.js';
 import { IGuildRole } from '../db/schemas/guildRole.schema.js';
 import { ImageName } from '../constants/images.js';
-import { CustomError } from '../structures/error.js';
 import { ICube } from '../db/schemas/cube.schema.js';
 import { User, Role } from 'discord.js';
 import { IUserDocument } from '../db/models/user.model.js';
@@ -13,6 +12,17 @@ interface LevelEmbed {
   discordUser: User,
   discordRole: Role,
   guild?: IGuildDocument
+}
+
+interface WelcomeEmbed {
+  guildMember: GuildMember,
+  discordRole: Role,
+  level: IGuildRole,
+}
+
+interface CubeEmbed {
+  discordUser:User, 
+  cubes: ICube[]
 }
 
 export function createLevelGetEmbed(info:LevelEmbed): EmbedBuilder {
@@ -47,18 +57,17 @@ export function createLevelUpEmbed(info:LevelEmbed): EmbedBuilder {
     .setImage(image);
 }
 
-export function createWelcomeEmbed(guildMember: GuildMember, guild:IGuildDocument) {
-  const levels = guild.getLevelsByPoints(0);
-  let role = guildMember.guild.roles.cache.get(levels.add[0].discordId);
-  if (!role) throw new CustomError('EMBED_ROLE_FOUND_1');
+export function createWelcomeEmbed(info:WelcomeEmbed) {
+  const { guildMember, discordRole, level } = info;
   return new EmbedBuilder() 
-    .setColor(role.color)
+    .setColor(discordRole.color)
     .setTitle(`Welcome ${guildMember.displayName}!`)
-    .setThumbnail(guild.getLevelsByPoints(0).add[0].image)
-    .setDescription(`<@!${process.env.CLIENT_ID}> polymorphed **${guildMember.displayName}** into a <@&${role.id}> Check out the rules channel to get started!`);
+    .setDescription(`<@!${process.env.CLIENT_ID}> polymorphed **${guildMember.displayName}** into a <@&${discordRole.id}> Check out the rules channel to get started!`)
+    .setThumbnail(level.image);
 }
 
-export function createCubesEmbed(discordUser:User, cubes: ICube[]) {
+export function createCubesEmbed(info:CubeEmbed) {
+  const { discordUser, cubes } = info;
   let description = '';
   cubes.forEach((cube, index) => description += `${index + 1}. ${cube.link}\n`);
   return new EmbedBuilder()

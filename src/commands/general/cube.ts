@@ -56,12 +56,12 @@ export default new CommandClass({
       try {
         const subcommand = interaction.options.getSubcommand();
         if (subcommand === 'get') {
-          let dsUser = interaction.options.getUser('user');
-          if (!dsUser) throw new Error('Discord user could not found be in guild!');
-          let user = await User.findUser(dsUser.id);
+          let discordUser = interaction.options.getUser('user');
+          if (!discordUser) throw new Error('Discord user could not found be in guild!');
+          let user = await User.findUser(discordUser.id);
           const cubes = user?.getCubes();
-          if (!cubes || !cubes.length) throw new CustomError('USER_CUBE_1', `**<@!${dsUser.id}>** has no cubes set.`);
-          const embed = createCubesEmbed(dsUser, cubes);
+          if (!cubes || !cubes.length) throw new CustomError('USER_CUBE_1', `**<@!${discordUser.id}>** has no cubes set.`);
+          const embed = createCubesEmbed({discordUser, cubes});
           embeds.push(embed);
           content = '';
           suppressEmbed = false;
