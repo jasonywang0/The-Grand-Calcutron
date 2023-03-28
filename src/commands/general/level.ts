@@ -46,9 +46,9 @@ export default new CommandClass({
         switch (subcommand) {
           case 'get': {
             const levels = guild.getLevelsByPoints(points);
-            await interaction.member.roles.add(levels.add.map(level => level.discordId)), // TODO: figure out why I can't put this in Promises.all
-            await interaction.member.roles.remove(levels.remove.map(level => level.discordId))
-            embeds.push(await createLevelGetEmbed({interaction, points, level: levels.add.pop()}));
+            const level = levels.add.pop();
+            const role = interaction.guild.roles.cache.get(level.discordId);
+            embeds.push(createLevelGetEmbed({user, discordUser: interaction.user, discordRole: role, level}));
             break;
           }
           case 'up': {
@@ -57,11 +57,13 @@ export default new CommandClass({
             ephemeral = false;
             points += 1;
             user.setPoints(points);
-            let levels = guild.getLevelsByPoints(points);
-            await interaction.member.roles.add(levels.add.map(level => level.discordId));
+            const levels = guild.getLevelsByPoints(points);
+            const level = levels.add.pop();
+            const role = interaction.guild.roles.cache.get(level.discordId);
+            await interaction.member.roles.add(levels.add.map(level => level.discordId)); // TODO: Use Promise.all
             await interaction.member.roles.remove(levels.remove.map(level => level.discordId));
-            const promises = await Promise.all([user.save(), createLevelUpEmbed({interaction, points, level: levels.add.pop()})]);
-            embeds.push(promises[1]);
+            await user.save();
+            embeds.push(createLevelUpEmbed({user, discordUser: interaction.user, discordRole: role, level, guild}));
             break;
           }
           case 'down': {

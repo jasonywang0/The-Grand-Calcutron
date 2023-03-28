@@ -1,53 +1,53 @@
-import { EmbedBuilder, ChatInputCommandInteraction, GuildMember } from 'discord.js';
-import { Guild, IGuildDocument } from '../db/models/guild.model.js';
+import { EmbedBuilder,  GuildMember } from 'discord.js';
+import { IGuildDocument } from '../db/models/guild.model.js';
 import { IGuildRole } from '../db/schemas/guildRole.schema.js';
 import { ImageName } from '../constants/images.js';
 import { CustomError } from '../structures/error.js';
 import { ICube } from '../db/schemas/cube.schema.js';
-import { User } from 'discord.js';
-interface levelInfo {
-  interaction: ChatInputCommandInteraction<'cached'>,
+import { User, Role } from 'discord.js';
+import { IUserDocument } from '../db/models/user.model.js';
+
+interface LevelEmbed {
+  user: IUserDocument,
   level: IGuildRole,
-  points: number
+  discordUser: User,
+  discordRole: Role,
+  guild?: IGuildDocument
 }
 
-export async function createLevelGetEmbed(info:levelInfo): Promise<EmbedBuilder> {
-  const { interaction, level, points } = info;
-  let role = interaction.guild.roles.cache.get(level.discordId);
-  if (!role) throw new CustomError('EMBED_ROLE_FOUND_1');
+export function createLevelGetEmbed(info:LevelEmbed): EmbedBuilder {
+  const { user, discordUser, discordRole, level } = info;
   return new EmbedBuilder()
-    .setColor(role.color)
-    .setTitle(`Level Stats`)
-    .setThumbnail(interaction.user.displayAvatarURL())
-    .setDescription(`**<@!${interaction.user.id}> is a <@&${role.id}> with ${points} points!**`)
-    .setImage(level.image || interaction.user.displayAvatarURL());
+    .setColor(discordRole.color)
+    .setTitle(`${discordUser.username}'s Level`)
+    .setThumbnail(discordUser.displayAvatarURL())
+    .setDescription(`**<@!${discordUser.id}> is a <@&${discordRole.id}> with ${user.getPoints()} points!**`)
+    .setImage(level.image || discordUser.displayAvatarURL());
 }
 
-export async function createLevelUpEmbed(info:levelInfo): Promise<EmbedBuilder> {
-  const { interaction, level, points } = info;
-  let color = 0x40863f;
-  let title = 'Level Up';
-  let description = `**<@!${interaction.user.id}> leveled up to ${points} points!**`;
-  const guild = await Guild.findByDiscordId(interaction.guildId);
-  let imageLink = guild.getImageByName(ImageName.Level).link;
+export function createLevelUpEmbed(info:LevelEmbed): EmbedBuilder {
+  const { user, discordUser, discordRole, level, guild } = info;
+  let color = discordRole.color;
+  const pointsStatement = user.points === 1 ? `${user.points} point` : `${user.points} points`;
+  let description = `**<@!${discordUser.id}> leveled up to <@&${discordRole.id}> with ${pointsStatement}!**`;
+  let image = level.image;
 
-  if (points === level.points) { // promotion
-    let role = interaction.guild.roles.cache.get(level.discordId);
-    if (!role) throw new CustomError('EMBED_ROLE_FOUND_1');
-    color = role.color;
-    imageLink = level.image;
-    const pointsGrammar = points === 1 ? 'point' : 'points'; 
-    description = `**<@!${interaction.user.id}> leveled up to <@&${role.id}> with ${points} ${pointsGrammar}!**`;
-  } 
+  // user is max level
+  if (user.points !== level.points) {
+    description = `**<@!${discordUser.id}> leveled up with ${pointsStatement}!**`;
+    color = 0x40863f;
+    if (guild) image = guild.getImageByName(ImageName.Level).link;
+  }
+
   return new EmbedBuilder()
     .setColor(color)
-    .setTitle(title)
-    .setThumbnail(interaction.user.displayAvatarURL())
+    .setTitle('Level Up')
     .setDescription(description)
-    .setImage(imageLink);
+    .setThumbnail(discordUser.displayAvatarURL())
+    .setImage(image);
 }
 
-export async function createWelcomeEmbed(guildMember: GuildMember, guild:IGuildDocument) {
+export function createWelcomeEmbed(guildMember: GuildMember, guild:IGuildDocument) {
   const levels = guild.getLevelsByPoints(0);
   let role = guildMember.guild.roles.cache.get(levels.add[0].discordId);
   if (!role) throw new CustomError('EMBED_ROLE_FOUND_1');
