@@ -3,14 +3,7 @@ This is a Discord bot used for the Online Cube Drafting server.
 
 ## Getting Started 🎉
 1. Clone the repository
-2. Open the [.env](.env.example) file and fill in the required values shown below
-```
-TOKEN=YOUR-TOKEN-HERE
-GUILD_ID=YOUR-GUILD-ID-HERE # <- add infront of GUILD_ID if you want to register commands globally
-CLIENT_ID=YOUR-CLIENT-ID
-MONGOOSE=MONGOOSE-CONNECTION-STRING
-CLIENT_ID= # Replace with your client id
-```
+2. Open the [.env](.env.example) file and fill in the required values
 3. Rename the [.env.example](.env.example) file to `.env`
 4. Installing dependencies
 ```sh-session
