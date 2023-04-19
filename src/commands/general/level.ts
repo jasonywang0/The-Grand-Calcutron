@@ -58,7 +58,7 @@ export default new CommandClass({
             points += 1;
             user.setPoints(points);
             const levels = guild.getLevelsByPoints(points);
-            const level = levels.add.pop();
+            const level = levels.add[levels.add.length - 1];
             const role = interaction.guild.roles.cache.get(level.discordId);
             await interaction.member.roles.add(levels.add.map(level => level.discordId)); // TODO: Use Promise.all
             await interaction.member.roles.remove(levels.remove.map(level => level.discordId));
